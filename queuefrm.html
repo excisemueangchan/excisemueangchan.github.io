@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบคิว</title>
+
+    <!-- bootstrap -->
+    <link href="./vender/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="./vender/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sweetalert -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.6/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.6/dist/sweetalert2.all.min.js"></script>
+
+    <style>
+        html,
+        body {
+            background-image: linear-gradient(rgb(0, 132, 255), rgb(126, 161, 201), rgb(174, 174, 175));
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .blink-text {
+            animation: blinker 1s linear infinite;
+            /* ปรับความเร็ว 1s (1 วินาที), linear (ความเร็วคงที่), infinite (กระพริบไม่รู้จบ) */
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+                /* ช่วงกลางของเวลา ข้อความจะหายไป (0%) */
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="card mt-2">
+            <div class="card-body bg-light">
+                <h5 class="card-title">ระบบจองคิวออนไลน์</h5>
+                <!-- <p class="card-text">สำนักงานสรรพสามิตพื้นที่จันทบุรี สาขาเมือง</p> -->
+            </div>
+        </div>
+
+        <div class="card my-2">
+            <div class="card-body g-3 bg-light">
+
+                <div class="mb-4">
+                    <label for="qname" class="form-label">ชื่อ-นามสกุล</label>
+                    <input type="text" class="form-control" id="qname" placeholder="ชื่อ-นามสกุล ผู้จองคิว..."
+                        value="" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">ประเภทงานที่ต้องการรับบริการ</label>
+                    <div class="form-check ps-5">
+                        <input class="form-check-input" type="radio" name="qtype" id="qtype1" value="1" checked>
+                        <label class="form-check-label" for="radioDefault1">ใบอนุญาตขายสุรา ยาสูบ ไพ่</label>
+                    </div>
+                    <div class="form-check ps-5">
+                        <input class="form-check-input" type="radio" name="qtype" id="qtype2" value="2">
+                        <label class="form-check-label" for="radioDefault2">รับชำระภาษี</label>
+                    </div>
+                    <div class="form-check ps-5">
+                        <input class="form-check-input" type="radio" name="qtype" id="qtype3" value="3">
+                        <label class="form-check-label" for="radioDefault3">อื่นๆ</label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="qdate" class="form-label">วันที่เข้ารับบริการ</label>
+                    <input type="date" class="form-control" id="qdate" placeholder="วันที่เข้ารับบริการ..." value="" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="qtime" class="form-label">เวลาเข้ารับบริการ</label>
+                    <select class="form-select" id="qtime">
+                        <option value='0' selected disabled hidden> ---เลือกเวลา--- </option>
+                        <option value='1'>09.00-09.30</option>
+                        <option value='2'>09.30-10.00</option>
+                        <option value='3'>10.00-10.30</option>
+                        <option value='4'>10.30-11.00</option>
+                        <option value='5'>11.00-11.30</option>
+                        <option value='6'>11.30-12.00</option>
+                        <option value='7'>13.00-13.30</option>
+                        <option value='8'>13.30-14.00</option>
+                        <option value='9'>14.00-14.30</option>
+                        <option value='10'>14.30-15.00</option>
+                        <option value='11'>15.00-15.30</option>
+                        <option value='12'>15.30-16.00</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="qphone" class="form-label">หมายเลขโทรศัพท์</label>
+                    <input type="text" class="form-control" id="qphone" placeholder="หมายเลขโทรศัพท์ผู้จองคิว..."
+                        value="" />
+                </div>
+
+                <div>
+                    <a type="button" class="btn btn-primary form-control" onclick="savequeue()">บันทึก</a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- loadingModal -->
+    <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="loadingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <!-- <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="loadingModalLabel">Modal title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div> -->
+                <div class="modal-body">
+                    <div class="ratio ratio-1x1" style="width: 100%;">
+                        <div class="spinner-border text-info" style="width: 100%; height: 100%;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <h2 class="text-center text-info blink-text">Loading.....</h2>
+                </div>
+                <!-- <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Understood</button>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/versions/2.21.4/sdk.js"></script>
+    <script>
+        var userId = "A001";
+        var displayName = "anonymous";
+        var pictureUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/250px-Anonymous_emblem.svg.png";
+        var apiURL = "https://script.google.com/macros/s/AKfycbwpS2jacsJtWU67JEb2QXxkTSbtAvJ2qFKsCyPcjNvVluX8nGEvF3WWoHl15G7Dga8/exec";
+
+        const loadingModal = new bootstrap.Modal('#loadingModal', {});
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        function initform() {
+            document.getElementById('qname').value = "";
+            document.getElementById('qtype1').checked = true;
+            document.getElementById('qdate').value = tomorrow.getFullYear() + "-" + ("0" + (tomorrow.getMonth() + 1)).slice(-2) + "-" + ("0" + tomorrow.getDate()).slice(-2);
+            document.getElementById('qdate').min = tomorrow.getFullYear() + "-" + ("0" + (tomorrow.getMonth() + 1)).slice(-2) + "-" + ("0" + tomorrow.getDate()).slice(-2);
+            document.getElementById('qtime').value = "0";
+            document.getElementById('qphone').value = "";
+            window.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
+            });
+            loadingModal.hide();
+        }
+
+        function savequeue() {
+            let qname = document.getElementById('qname').value;
+            let qtype = parseInt(document.querySelector('input[name="qtype"]:checked').value);
+            let qdate = document.getElementById('qdate').value;
+            let qtime = parseInt(document.getElementById('qtime').value);
+            let qphone = document.getElementById('qphone').value;
+
+            console.log([qname, qtype, qdate, qtime, qphone]);
+
+            loadingModal.show();
+
+            if (qname == "" || qtype == 0 || qdate == "" || qtime == 0 || qphone == "") {
+                Swal.fire({
+                    title: "Warning",
+                    text: "กรุณากรอกข้อมูลให้ครบถ้วน",
+                    icon: "warning"
+                }).then(() => {
+                    window.scrollTo({
+                        top: 0,
+                        left: 0,
+                        behavior: 'smooth'
+                    });
+                    loadingModal.hide();
+                });
+            } else {
+
+                let raw = {
+                    "userId": userId,
+                    "displayName": displayName,
+                    "pictureUrl": pictureUrl,
+                    "qname": qname,
+                    "qtype": qtype,
+                    "qdate": qdate,
+                    "qtime": qtime,
+                    "qphone": qphone
+                };
+
+                let options = {
+                    method: "POST",
+                    redirect: "follow",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify(raw)
+                };
+
+
+                fetch(apiURL + '?fn=savequeue', options)
+                    .then((response) => response.json())
+                    .then((result) => {
+                        if (result.res) {
+                            liff.sendMessages([
+                                {
+                                    type: "text",
+                                    text: "เลขที่การจอง: " + result.no,
+                                },
+                            ])
+                                .then(() => {
+                                    console.log("message sent");
+                                })
+                                .catch((err) => {
+                                    console.log("error", err);
+                                });
+
+                            Swal.fire({
+                                title: "Success",
+                                text: "ดำเนินการเสร็จสิ้น ส่วนเทคโนโลยีสารสนเทศจะรีบดำเนินการแก้ไขให้ครับ",
+                                icon: "success"
+                            }).then(() => {
+                                initform();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Error",
+                                text: "ดำเนินการผิดพลาด กรุณาลองใหม่อีกครั้ง",
+                                icon: "error"
+                            }).then(() => {
+                                loadingModal.hide();
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            title: "Error",
+                            text: "ดำเนินการผิดพลาด กรุณาลองใหม่อีกครั้ง",
+                            icon: "error"
+                        }).then(() => {
+                            loadingModal.hide();
+                        });
+                        console.log(error);
+                    });
+
+            }
+        }
+
+        loadingModal.show();
+
+        liff.init({ liffId: "1660727236-AbmnnyqB" }, () => {
+            if (liff.isLoggedIn()) {
+                liff.getProfile().then(profile => {
+                    userId = profile.userId;
+                    displayName = profile.displayName;
+                    pictureUrl = profile.pictureUrl;
+                    initform();
+                }).catch(err => {
+                    Swal.fire({
+                        title: "Error",
+                        text: "การการเชื่อมต่อข้อมูลผิดพลาด กรุณาลองใหม่อีกครั้ง",
+                        icon: "error"
+                    }).then(() => {
+                        liff.closeWindow();
+                    });
+                    console.error(err);
+                });
+            } else {
+                liff.login();
+            }
+        }, err => {
+            Swal.fire({
+                title: "Error",
+                text: "การการเชื่อมต่อข้อมูลผิดพลาด กรุณาลองใหม่อีกครั้ง",
+                icon: "error"
+            }).then(() => {
+                liff.closeWindow();
+            });
+            console.error(err.code, error.message);
+        });
+    </script>
+</body>
+
+</html>
