@@ -84,20 +84,15 @@
         const loadingModal = new bootstrap.Modal('#loadingModal', {});
 
         function getqueues() {
-            userId = "Ubbc15578ccd7d5c9f8fb905e07278074";
-
             let raw = {
                 "userId": userId,
             };
-
             let options = {
                 method: "POST",
                 redirect: "follow",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(raw)
             };
-
-
             fetch(apiURL + '?fn=getqueues', options)
                 .then((response) => response.json())
                 .then((result) => {
@@ -177,3 +172,4 @@
 
 
 </html>
+
