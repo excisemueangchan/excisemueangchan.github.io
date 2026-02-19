@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบคิว</title>
+
+    <!-- bootstrap -->
+    <link href="./vender/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="./vender/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sweetalert -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.6/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.6/dist/sweetalert2.all.min.js"></script>
+
+    <style>
+        html,
+        body {
+            background-image: linear-gradient(rgb(0, 132, 255), rgb(126, 161, 201), rgb(174, 174, 175));
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .blink-text {
+            animation: blinker 1s linear infinite;
+            /* ปรับความเร็ว 1s (1 วินาที), linear (ความเร็วคงที่), infinite (กระพริบไม่รู้จบ) */
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+                /* ช่วงกลางของเวลา ข้อความจะหายไป (0%) */
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="card mt-2">
+            <div class="card-body bg-light">
+                <h5 class="card-title">ข้อมูลการจองคิวจองคิวออนไลน์</h5>
+                <!-- <p class="card-text">สำนักงานสรรพสามิตพื้นที่จันทบุรี สาขาเมือง</p> -->
+            </div>
+        </div>
+        <div id="qlist">
+            <div class='card my-2'>
+                <div class='card-body bg-light'>&nbsp;</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- loadingModal -->
+    <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="loadingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <!-- <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="loadingModalLabel">Modal title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div> -->
+                <div class="modal-body">
+                    <div class="ratio ratio-1x1" style="width: 100%;">
+                        <div class="spinner-border text-info" style="width: 100%; height: 100%;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <h2 class="text-center text-info blink-text">Loading.....</h2>
+                </div>
+                <!-- <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Understood</button>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var userId = "A001";
+        var apiURL = "https://script.google.com/macros/s/AKfycbwpS2jacsJtWU67JEb2QXxkTSbtAvJ2qFKsCyPcjNvVluX8nGEvF3WWoHl15G7Dga8/exec";
+        const loadingModal = new bootstrap.Modal('#loadingModal', {});
+
+        function getqueues() {
+            userId = "Ubbc15578ccd7d5c9f8fb905e07278074";
+
+            let raw = {
+                "userId": userId,
+            };
+
+            let options = {
+                method: "POST",
+                redirect: "follow",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(raw)
+            };
+
+
+            fetch(apiURL + '?fn=getqueues', options)
+                .then((response) => response.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.length > 0) {
+
+                        let qlist = "";
+
+                        result.forEach(item => {
+                            qlist += "<div class='card my-2'><div class='card-body bg-light'>";
+                            qlist += "<table class='table table-striped'><tbody>";
+                            qlist += "<tr><th style='width: 100px;'>เลขที่</th><td>" + item.no + "</td></tr>";
+                            qlist += "<tr><th>ผู้จอง</th><td>" + item.qname + "</td></tr>";
+                            qlist += "<tr><th>บริการ</th><td>" + item.typetxt + "</td></tr>";
+                            qlist += "<tr><th>วันที่</th><td>" + item.qdate + "</td></tr>";
+                            qlist += "<tr><th>เวลา</th><td>" + item.timetxt + "</td></tr>";
+                            qlist += "<tr><th>สถานะ</th><td>" + item.qstatus + "</td></tr>";
+                            qlist += "</tbody></table>";
+                            qlist += "</div></div>";
+                        });
+
+                        document.getElementById('qlist').innerHTML = qlist;
+
+                    } else {
+                        Swal.fire({
+                            title: "เสร็จสิ้น",
+                            text: "ไม่พบข้อมูลการจองคิวของท่าน",
+                            icon: "info"
+                        });
+                    }
+                    loadingModal.hide();
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        title: "Error",
+                        text: "ดำเนินการผิดพลาด กรุณาลองใหม่อีกครั้ง",
+                        icon: "error"
+                    }).then(() => {
+                        loadingModal.hide();
+                    });
+                    console.log(error);
+                });
+        }
+
+        loadingModal.show();
+        
+        liff.init({ liffId: "2009105579-DaI9CiUA" }, () => {
+            if (liff.isLoggedIn()) {
+                liff.getProfile().then(profile => {
+                    userId = profile.userId;
+                    getqueues();
+                }).catch(err => {
+                    Swal.fire({
+                        title: "Error",
+                        text: "การการเชื่อมต่อข้อมูลผิดพลาด กรุณาลองใหม่อีกครั้ง",
+                        icon: "error"
+                    }).then(() => {
+                        liff.closeWindow();
+                    });
+                    console.error(err);
+                });
+            } else {
+                liff.login();
+            }
+        }, err => {
+            Swal.fire({
+                title: "Error",
+                text: "การการเชื่อมต่อข้อมูลผิดพลาด กรุณาลองใหม่อีกครั้ง",
+                icon: "error"
+            }).then(() => {
+                liff.closeWindow();
+            });
+            console.error(err.code, error.message);
+        });
+    </script>
+</body>
+
+</html>
