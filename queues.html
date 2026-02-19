@@ -77,7 +77,8 @@
             </div>
         </div>
     </div>
-
+    
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/versions/2.21.4/sdk.js"></script>
     <script>
         var userId = "A001";
         var apiURL = "https://script.google.com/macros/s/AKfycbwpS2jacsJtWU67JEb2QXxkTSbtAvJ2qFKsCyPcjNvVluX8nGEvF3WWoHl15G7Dga8/exec";
@@ -96,11 +97,8 @@
             fetch(apiURL + '?fn=getqueues', options)
                 .then((response) => response.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.length > 0) {
-
                         let qlist = "";
-
                         result.forEach(item => {
                             qlist += "<div class='card my-2'><div class='card-body bg-light'>";
                             qlist += "<table class='table table-striped'><tbody>";
@@ -113,9 +111,7 @@
                             qlist += "</tbody></table>";
                             qlist += "</div></div>";
                         });
-
                         document.getElementById('qlist').innerHTML = qlist;
-
                     } else {
                         Swal.fire({
                             title: "เสร็จสิ้น",
@@ -172,4 +168,5 @@
 
 
 </html>
+
 
